@@ -41,8 +41,15 @@ void Information::UpdateGeneralInformation()
 
     for (int i = 0; i < log->GetEvents().size(); i++)
     {
-        std::string data = log->GetEvents()[i]->timestamp + "   " + log->GetEvents()[i]->type + "   " + log->GetEvents()[i]->details;
-        general->AddItem({ "", data });
+        ListViewItem::Type fontType = ListViewItem::Type::Normal;
+
+        if (log->GetEvents()[i]->type == "ERROR")
+            fontType = ListViewItem::Type::ErrorInformation;
+        else if (log->GetEvents()[i]->type == "WARN")
+            fontType = ListViewItem::Type::WarningInformation;
+
+        general->AddItem({ "", ls.Format("%-26s %-7s %s", log->GetEvents()[i]->timestamp.c_str(), log->GetEvents()[i]->type.c_str(), log->GetEvents()[i]->details.c_str()) })
+            .SetType(fontType);
     }
 }
 
