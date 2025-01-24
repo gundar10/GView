@@ -25,6 +25,10 @@ namespace Type
                 std::string timestamp;
                 std::string type;
                 std::string details;
+                std::string ipAddress;
+
+                event(std::string ts, std::string t, std::string d, std::string ip = "")
+                    : timestamp(std::move(ts)), type(std::move(t)), details(std::move(d)), ipAddress(std::move(ip)) {}
             };
 
             std::vector<event*> events;

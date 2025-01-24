@@ -7,7 +7,7 @@ namespace GView::Type::LOG::Panels
 Information::Information(Reference<GView::Type::LOG::LOGFile> log) : TabPage("Informa&Tion")
 {
     this->log = log;
-    general   = Factory::ListView::Create(this, "x:0,y:0,w:100%,h:10", { "n:Field,w:12", "n:Value,w:100" }, ListViewFlags::None);
+    general   = Factory::ListView::Create(this, "x:0,y:0,w:100%,h:10", { "n:Field,w:20", "n:Value,w:100%" }, ListViewFlags::None);
 
     this->Update();
 }
@@ -48,7 +48,7 @@ void Information::UpdateGeneralInformation()
         else if (log->GetEvents()[i]->type == "WARN")
             fontType = ListViewItem::Type::WarningInformation;
 
-        general->AddItem({ "", ls.Format("%-26s %-7s %s", log->GetEvents()[i]->timestamp.c_str(), log->GetEvents()[i]->type.c_str(), log->GetEvents()[i]->details.c_str()) })
+        general->AddItem({ "", ls.Format("%-30s %-15s %-17s %s", log->GetEvents()[i]->timestamp.c_str(), log->GetEvents()[i]->type.c_str(), log->GetEvents()[i]->ipAddress.c_str(), log->GetEvents()[i]->details.c_str()) })
             .SetType(fontType);
     }
 }
