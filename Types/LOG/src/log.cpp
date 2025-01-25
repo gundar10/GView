@@ -11,16 +11,31 @@ extern "C"
 {
     PLUGIN_EXPORT bool Validate(const AppCUI::Utils::Buffer& buf, const std::string_view& extension)
     {
-        CHECK(extension == ".log", false, "Unsupported extension: [%.*s]", extension.length(), extension.data());
-        for (auto i = 0U; i < buf.GetLength(); i++)
-        {
-            if (std::isdigit(buf[i]) || buf[i] == '[' || buf[i] == ']')
-            {
-                return true; // Timestamps or log structure detected
+
+        bool structureDetected;
+
+        if (extension != ".log") {
+            structureDetected = false;
+        }
+        // looking for timestamp patterns
+        for (auto i = 0U; i < buf.GetLength(); i++) {
+            if (std::isdigit(buf[i]) || buf[i] == '[' || buf[i] == ']') {
+                structureDetected = true;
+                break;
             }
         }
-        return false;
+        if (!structureDetected) {
+            return false;
+        }
+        return true;
     }
+
+    void CreateBufferView(Reference<GView::View::WindowInterface> win, Reference<LOG::LOGFile> log)
+    {
+        GView::View::BufferViewer::Settings settings;
+        log->selectionZoneInterface = win->GetSelectionZoneInterfaceFromViewerCreation(settings);
+    }
+
 
     PLUGIN_EXPORT TypeInterface* CreateInstance()
     {
@@ -31,10 +46,7 @@ extern "C"
     {
         auto log = win->GetObject()->GetContentType<LOG::LOGFile>();
         log->Update(win->GetObject());
-
-        GView::View::BufferViewer::Settings bufferSettings;
-        log->UpdateBufferViewZones(bufferSettings);
-        log->selectionZoneInterface = win->GetSelectionZoneInterfaceFromViewerCreation(bufferSettings);
+        CreateBufferView(win, log);
 
         // Add Information Panel
         if (log->HasPanel(LOG::Panels::IDs::Information))

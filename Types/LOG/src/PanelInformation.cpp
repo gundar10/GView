@@ -4,22 +4,18 @@ using namespace GView::Type::LOG;
 
 namespace GView::Type::LOG::Panels
 {
-Information::Information(Reference<GView::Type::LOG::LOGFile> log) : TabPage("Informa&Tion")
+Information::Information(Reference<GView::Type::LOG::LOGFile> log) : TabPage("&Information")
 {
     this->log = log;
     general   = Factory::ListView::Create(this, "x:0,y:0,w:100%,h:10", { "n:Field,w:20", "n:Value,w:100%" }, ListViewFlags::None);
-
+    issues    = Factory::ListView::Create(this, "x:0,y:21,w:100%,h:10", { "n:Info,w:200" }, ListViewFlags::HideColumns);
     this->Update();
-}
-
-void Information::OnAfterResize(int newWidth, int newHeight)
-{
-    RecomputePanelsPositions();
 }
 
 void Information::Update()
 {
     UpdateGeneralInformation();
+    UpdateIssues();
     RecomputePanelsPositions();
 }
 
@@ -38,6 +34,8 @@ void Information::UpdateGeneralInformation()
 
     std::string dataLines = std::to_string(log->GetEvents().size()) + " entries";
     general->AddItem({ "Extracted Data", dataLines });
+    general->AddItem({ "", "Timestamp                     | Type          | IP Address      | Details" }).SetType(ListViewItem::Type::Normal);
+
 
     for (int i = 0; i < log->GetEvents().size(); i++)
     {
@@ -48,16 +46,30 @@ void Information::UpdateGeneralInformation()
         else if (log->GetEvents()[i]->type == "WARN")
             fontType = ListViewItem::Type::WarningInformation;
 
-        general->AddItem({ "", ls.Format("%-30s %-15s %-17s %s", log->GetEvents()[i]->timestamp.c_str(), log->GetEvents()[i]->type.c_str(), log->GetEvents()[i]->ipAddress.c_str(), log->GetEvents()[i]->details.c_str()) })
-            .SetType(fontType);
+        general->AddItem({ "",
+                          ls.Format(
+                                "%-30s %-15s %-17s %s",
+                                log->GetEvents()[i]->timestamp.empty() ? "N/A" : log->GetEvents()[i]->timestamp.c_str(),
+                                log->GetEvents()[i]->type.empty() ? "N/A" : log->GetEvents()[i]->type.c_str(),
+                                log->GetEvents()[i]->ipAddress.empty() ? "N/A" : log->GetEvents()[i]->ipAddress.c_str(),
+                                log->GetEvents()[i]->details.empty() ? "N/A" : log->GetEvents()[i]->details.c_str()) })
+              .SetType(fontType);
+
     }
+}
+
+void Information::UpdateIssues()
+{
+
 }
 
 void Information::RecomputePanelsPositions()
 {
-    if (this->general != nullptr)
-    {
-        if (this->general->GetItemsCount() > 15)
+    if ((!general.IsValid()) || (!issues.IsValid()))
+        return;
+
+    issues->SetVisible(false);
+    if (this->general->GetItemsCount() > 15)
         {
             this->general->Resize(this->GetWidth(), 18);
         }
@@ -65,7 +77,6 @@ void Information::RecomputePanelsPositions()
         {
             this->general->Resize(this->GetWidth(), this->general->GetItemsCount() + 3);
         }
-    }
 }
 
 } // namespace GView::Type::LOG::Panels

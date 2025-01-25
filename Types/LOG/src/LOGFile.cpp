@@ -8,11 +8,6 @@ LOGFile::LOGFile() : panelsMask(0)
     this->panelsMask |= (1ULL << (unsigned char) Panels::IDs::Information);
 }
 
-std::string_view LOGFile::GetTypeName()
-{
-    return "LOG File";
-}
-
 bool LOGFile::Update(Reference<GView::Object> _obj)
 {
     this->obj = _obj;
