@@ -11,6 +11,7 @@ extern "C"
 {
     PLUGIN_EXPORT bool Validate(const AppCUI::Utils::Buffer& buf, const std::string_view& extension)
     {
+        // the extension being passed to the Validate function is empty so the true case never happens with open file only with drag and drop
         CHECK(extension == ".tsv" || extension == ".csv", false, "Wrong extension: [%.*s]!", extension.length(), extension.data());
         if (extension == ".tsv")
         {

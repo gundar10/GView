@@ -12,11 +12,11 @@ extern "C"
     PLUGIN_EXPORT bool Validate(const AppCUI::Utils::Buffer& buf, const std::string_view& extension)
     {
 
-        bool structureDetected;
-
-        if (extension != ".log") {
-            structureDetected = false;
-        }
+        bool structureDetected{};
+        // the extension being passed to the Validate function is empty with open file
+        //if (extension != ".log") {
+        //    structureDetected = false;
+        //}
         // looking for timestamp patterns
         for (auto i = 0U; i < buf.GetLength(); i++) {
             if (std::isdigit(buf[i]) || buf[i] == '[' || buf[i] == ']') {
